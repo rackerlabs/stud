@@ -1,6 +1,11 @@
+stud (0.3~0.20130712) unstable; urgency=low
+
+  * Add basic init script
+
+ -- Florian Hines <fhines@rackspace.com>  Fri, 12 July 2013 13:27:00 +0000
+
 stud (0.3~0.20111212) unstable; urgency=low
 
   * Initial release.
 
  -- Charlie Root <root@interseek.com>  Mon, 12 Dec 2011 13:24:18 +0100
-

@@ -1,0 +1,74 @@
+### BEGIN INIT INFO
+# Provides:     stud
+# Required-Start:    $local_fs $remote_fs
+# Required-Stop:     $local_fs $remote_fs
+# Should-Start:      $syslog
+# Should-Stop:       $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start or stop stud (SSL offloader)
+### END INIT INFO
+
+#######################################################
+#                      GLOBALS                        #
+#######################################################
+
+# instance configuration directory
+CONFIG_DIR="/etc/stud"
+
+# Runtime directory data
+RUNTIME_DIR="/var/run/stud"
+
+# filedescriptor limit
+ULIMIT_N=100000
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON="/usr/bin/stud"
+DOPTS="--config=/etc/stud/stud.conf --daemon"
+NAME=stud
+DESC=stud
+PIDFILE=/var/run/$NAME.pid
+
+test -x $DAEMON || exit 0
+
+set -e
+
+. /lib/lsb/init-functions
+
+case "$1" in
+  start)
+    echo -n "Starting $DESC: "
+    ulimit -n $ULIMIT_N
+    start-stop-daemon --start --quiet --exec $DAEMON -- $DOPTS
+    ;;
+  stop)
+    echo -n "Stopping $DESC: "
+    start-stop-daemon --stop --quiet --oknodo --exec $DAEMON --retry=TERM/5/KILL/5
+    ;;
+
+  restart|force-reload)
+    #
+    #   If the "reload" option is implemented, move the "force-reload"
+    #   option to the "reload" entry above. If not, "force-reload" is
+    #   just the same as "restart".
+    #
+    echo -n "Restarting $DESC: "
+    start-stop-daemon --stop --quiet --oknodo
+    sleep 1
+    ulimit -n $ULIMIT_N
+    start-stop-daemon --start --quiet --exec $DAEMONBOOTSTRAP
+    echo "$NAME."
+    ;;
+  status)
+    status_of_proc $DAEMON $NAME
+    ;;
+  test)
+    $DAEMON $DOPTS -t
+    ;;
+  *)
+    N=/etc/init.d/$NAME
+    echo "Usage: $N {start|stop|restart|status|test}" >&2
+    exit 1
+    ;;
+esac
+
+exit 0
